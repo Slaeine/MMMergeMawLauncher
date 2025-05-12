@@ -68,16 +68,24 @@ tree.pack(fill='both', expand=True)
 # --- Helper Functions ---
 
 def find_mm8():
-    logging.debug("Locating mm8.exe...")
-    paths = [
-        os.path.expandvars(r"C:\Users\%USERNAME%\OneDrive\Desktop\Might and Magic 8"),
-        os.path.expandvars(r"C:\Users\%USERNAME%\Desktop\Might and Magic 8"),
+    logging.debug("Locating mm8.exe by scanning Desktop...")
+    desktop_dirs = [
+        os.path.expandvars(r"C:\\Users\\%USERNAME%\\OneDrive\\Desktop"),
+        os.path.expandvars(r"C:\\Users\\%USERNAME%\\Desktop"),
     ]
-    for path in paths:
-        exe = os.path.join(path, PROGRAM_NAME)
-        if os.path.exists(exe):
-            return exe
+    for base in desktop_dirs:
+        if os.path.isdir(base):
+            # search first-level subdirectories
+            for entry in os.listdir(base):
+                path = os.path.join(base, entry)
+                if os.path.isdir(path):
+                    exe = os.path.join(path, PROGRAM_NAME)
+                    if os.path.exists(exe):
+                        logging.debug(f"Found mm8.exe at: {exe}")
+                        return exe
+    logging.warning("mm8.exe not found in any Desktop subfolder.")
     return None
+
 
 
 def get_local_version_date():
